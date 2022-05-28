@@ -27,7 +27,7 @@
 	aliases {
 		serial0 = &uart1;	/* DBGU - data is available on USB port (MCP2200 USB <-> Serial converter) */
 		serial1 = &uart8;	/* Flexcom 3 */
-		i2c0	= &i2c0;
+		i2c1	= &i2c3;
 	};
 
 	chosen {
