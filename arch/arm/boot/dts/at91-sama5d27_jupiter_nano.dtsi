@@ -18,7 +18,7 @@
 #include <dt-bindings/gpio/gpio.h>
 
 / {
-	model = "Atmel SAMA5D27 SoM1";
+	model = "Atmel SAMA5D27 Jupiter Nano";
 	compatible = "atmel,sama5d27-jupiter-nano", "atmel,sama5d27", "atmel,sama5d2", "atmel,sama5";
 
 	clocks {

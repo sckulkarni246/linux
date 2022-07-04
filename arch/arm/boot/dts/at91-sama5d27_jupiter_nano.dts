@@ -14,6 +14,42 @@
  *                2017 Cristian Birsan <cristian.birsan@microchip.com>
  *                2017 Claudiu Beznea <claudiu.beznea@microchip.com>
  */
+
+ /*
+	----------------------------------------------------------------------
+	4 July - Pinout Update - Shashank Kulkarni (shanky.kulkarni@gmail.com)
+	----------------------------------------------------------------------
+
+	Fx = FLEXCOM, F0 = UART, F3 = SPI, F4 = I2C
+
+				------------------------
+	GND			(25)  -			  -	 (01)	GND
+	VBAT IN		(26)  -			  -	 (02)	3V3 OUT
+	WAKEUP		(27)  -			  -	 (03)	AREF
+	VBUS 5V IN	(28)  -			  -	 (04)	RESET
+	ADTRG		(29) PD31		PD19 (05)	UART2 RXD
+	PWMH1		(30) PB00		PD20 (06)	UART2 TXD
+	PWML1		(31) PB01		PD21 (07)	ANALOG1
+	PWMH2		(32) PB05		PD22 (08)	ANALOG2
+	PWML2		(33) PB06		PD23 (09)	ANALOG3
+	GPIO9 - D1	(34) PB07		PA27 (10)	GPIO6
+	GPIO10 - D2	(35) PB08		PC05 (11)	GPIO7 - PB1
+	PWMEXTTRG1	(36) PB03		PC03 (12)	GPIO8 - PB2
+	I2C0 SCL	(37) PC28		PC01 (13)	CAN0 TXD
+	I2C0 SDA	(38) PC27		PC02 (14)	CAN0 RXD
+	SPI1 MOSI	(39) PD26		PB28 (15)	F0 UTXD
+	SPI1 MISO	(40) PD27		PB29 (16)	F0 URXD
+	SPI1 CS0	(41) PD28		PB30 (17)	F0 USCK
+	GPIO1		(42) PD29		PB31 (18)	F0 UCTS
+	GPIO2		(43) PD30		PC00 (19)	F0 URTS
+	F3 MOSI		(44) PA15		PD12 (20)	F4 SCL
+	F3 MISO		(45) PA13		PD13 (21)	F4 SDA
+	F3 SCK		(46) PA14		PC30 (22)	GPIO3
+	F3 CS0		(47) PA16		PC31 (23)	GPIO4
+	GPIO5		(48) PA17		PD25 (24)	SPI1 SCK
+				-------------------------
+
+ */
 /dts-v1/;
 #include "at91-sama5d27_jupiter_nano.dtsi"
 #include <dt-bindings/mfd/atmel-flexcom.h>
@@ -21,7 +57,7 @@
 #include <dt-bindings/input/input.h>
 
 / {
-	model = "Atmel SAMA5D27 SOM1 EK";
+	model = "Atmel SAMA5D27 Jupiter Nano";
 	compatible = "atmel,sama5d27-jupiter-nano", "atmel,sama5d27-som1", "atmel,sama5d27", "atmel,sama5d2", "atmel,sama5";
 
 	aliases {
@@ -72,22 +108,30 @@
 				status = "okay";
 			};
 
+			uart2: serial@f8024000 {
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_uart2_default>;
+				atmel,use-dma-rx;
+				atmel,use-dma-tx;
+				status = "okay";
+			};
+
 			pwm0: pwm@f802c000 {
 				pinctrl-names = "default";
 				pinctrl-0 = <&pinctrl_ch1_high &pinctrl_ch2_high>;
 				status = "okay";
 			};
 
-			flx0: flexcom@f8034000 {
+			flx3: flexcom@fc014000 {
 				atmel,flexcom-mode = <ATMEL_FLEXCOM_MODE_SPI>;
 				status = "okay";
 
 				spi2: spi@400 {
 					pinctrl-names = "default";
-					pinctrl-0 = <&pinctrl_flx0_spi &pinctrl_flx0_cs0 &pinctrl_flx0_cs1>;
+					pinctrl-0 = <&pinctrl_flx3_default>;
 					status = "okay";
 
-					spidev@0 {
+					spidev@1 {
 						compatible = "atmel,at91rm9200-spidev";
 						reg = <0>;
 						spi-max-frequency = <1000000>;
@@ -95,23 +139,59 @@
 				};
 			};
 
-			flx1: flexcom@f8038000 {
+			flx0: flexcom@f8034000 {
+				atmel,flexcom-mode = <ATMEL_FLEXCOM_MODE_USART>;
+				status = "okay";
+
+				uart5: serial@200 {
+					pinctrl-names = "default";
+					pinctrl-0 = <&pinctrl_flx0_default>;
+					status = "okay";
+
+				};
+			};
+
+			flx4: flexcom@fc018000 {
 				atmel,flexcom-mode = <ATMEL_FLEXCOM_MODE_TWI>;
 				status = "okay";
 
-				i2c3: i2c@600 {
+				i2c6: i2c@600 {
 					dmas = <0>, <0>;
 					i2c-analog-filter;
 					i2c-digital-filter;
 					i2c-digital-filter-width-ns = <35>;
 					pinctrl-names = "default", "gpio";
-					pinctrl-0 = <&pinctrl_eeprom_i2c>;
-					pinctrl-1 = <&pinctrl_i2c3_gpio>;
-					sda-gpios = <&pioA PIN_PA24 GPIO_ACTIVE_HIGH>;
-					scl-gpios = <&pioA PIN_PA23 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+					pinctrl-0 = <&pinctrl_f4_i2c_gpio>;
+					sda-gpios = <&pioA PIN_PD12 GPIO_ACTIVE_HIGH>;
+					scl-gpios = <&pioA PIN_PD13 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
 					status = "okay";
 				};
 			};
+
+			i2c0: i2c@f8028000 {
+				dmas = <0>, <0>;
+				i2c-analog-filter;
+				i2c-digital-filter;
+				i2c-digital-filter-width-ns = <35>;
+				pinctrl-names = "default", "gpio";
+				pinctrl-0 = <&pinctrl_i2c0_gpio>;
+				sda-gpios = <&pioA PIN_PDC27 GPIO_ACTIVE_HIGH>;
+				scl-gpios = <&pioA PIN_PC28 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+				status = "okay";
+			};
+
+			spi1: spi@fc000000 {
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_spi1_default>;
+				status = "okay";
+
+				spidev@0 {
+					compatible = "atmel,at91rm9200-spidev";
+					reg = <0>;
+					spi-max-frequency = <1000000>;
+				};
+			};
+
 
 			shdwc@f8048010 {
 				debounce-delay-us = <976>;
@@ -126,23 +206,11 @@
 				status = "okay";
 			};
 
-			flx3: flexcom@fc014000 {
-				atmel,flexcom-mode = <ATMEL_FLEXCOM_MODE_USART>;
-				status = "okay";
-
-				uart8: serial@200 {
-					dmas = <0>, <0>;
-					pinctrl-names = "default";
-					pinctrl-0 = <&pinctrl_flx3_default>;
-					status = "okay";
-				};
-			};
-
 			adc: adc@fc030000 {
 				vddana-supply = <&vddana>;
 				vref-supply = <&advref>;
 				pinctrl-names = "default";
-				pinctrl-0 = <&pinctrl_ad0 &pinctrl_ad1>;
+				pinctrl-0 = <&pinctrl_ad2 &pinctrl_ad3 &pinctrl_ad4>;
 
 				status = "okay";
 			};
@@ -164,15 +232,23 @@
 					bias-disable;
 				};
 
-				pinctrl_eeprom_i2c: eeprom_i2c {
-					pinmux = <PIN_PA24__FLEXCOM1_IO0>,
-						 <PIN_PA23__FLEXCOM1_IO1>;
+				pinctrl_f4_i2c_gpio: f4_i2c_gpio {
+					pinmux = <PIN_PD12__FLEXCOM4_IO0>,
+						 <PIN_PD13__FLEXCOM4_IO1>;
 					bias-disable;
 				};
 
-				pinctrl_i2c3_gpio: i2c3_gpio {
-					pinmux = <PIN_PA24__GPIO>,
-						 <PIN_PA23__GPIO>;
+				pinctrl_i2c0_gpio: i2c0_gpio {
+					pinmux = <PIN_PC27__TWD0>,
+						 <PIN_PC28__TWCK0>;
+					bias-disable;
+				};
+
+				pinctrl_spi1_default: spi1_default {
+					pinmux = <PIN_PD25__SPI1_SPCK>,
+						 <PIN_PA26__SPI1_MOSI>,
+						 <PIN_PD27__SPI1_MISO>,
+						 <PIN_PD28__SPI1_NPCS0>;
 					bias-disable;
 				};
 
@@ -204,30 +280,33 @@
 					bias-disable;
 				};
 
-				pinctrl_ad0: ad0 {
-					pinmux = <PIN_PD19__GPIO>;
+				pinctrl_uart2_default: uart2_default {
+					pinmux = <PIN_PD19__URXD2>,
+						 <PIN_PD20__UTXD2>;
 					bias-disable;
 				};
 
-				pinctrl_ad1: ad1 {
-					pinmux = <PIN_PD20__GPIO>;
+				pinctrl_ad2: ad2 {
+					pinmux = <PIN_PD21__GPIO>;
 					bias-disable;
 				};
 
-				pinctrl_flx0_cs0: flx0_cs0 {
-					pinmux = <PIN_PB31__FLEXCOM0_IO3>;
+				pinctrl_ad3: ad3 {
+					pinmux = <PIN_PD22__GPIO>;
 					bias-disable;
 				};
 
-				pinctrl_flx0_cs1: flx0_cs1 {
-					pinmux = <PIN_PC0__FLEXCOM0_IO4>;
+				pinctrl_ad4: ad4 {
+					pinmux = <PIN_PD23__GPIO>;
 					bias-disable;
 				};
 
-				pinctrl_flx0_spi: flx0_spi {
+				pinctrl_flx0_default: flx0_default {
 					pinmux = <PIN_PB28__FLEXCOM0_IO0>,
 						 <PIN_PB29__FLEXCOM0_IO1>,
-						 <PIN_PB30__FLEXCOM0_IO2>;
+						 <PIN_PB30__FLEXCOM0_IO2>,
+						 <PIN_PB31__FLEXCOM0_IO3>,
+						 <PIN_PC0__FLEXCOM0_IO4>;
 					bias-disable;
 				};
 
