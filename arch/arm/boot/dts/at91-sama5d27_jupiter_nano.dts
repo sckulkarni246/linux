@@ -126,12 +126,12 @@
 				atmel,flexcom-mode = <ATMEL_FLEXCOM_MODE_SPI>;
 				status = "okay";
 
-				spi2: spi@400 {
+				spi5: spi@400 {
 					pinctrl-names = "default";
 					pinctrl-0 = <&pinctrl_flx3_default>;
 					status = "okay";
 
-					spidev@1 {
+					spidev@0 {
 						compatible = "atmel,at91rm9200-spidev";
 						reg = <0>;
 						spi-max-frequency = <1000000>;
@@ -175,7 +175,7 @@
 				i2c-digital-filter-width-ns = <35>;
 				pinctrl-names = "default", "gpio";
 				pinctrl-0 = <&pinctrl_i2c0_gpio>;
-				sda-gpios = <&pioA PIN_PDC27 GPIO_ACTIVE_HIGH>;
+				sda-gpios = <&pioA PIN_PC27 GPIO_ACTIVE_HIGH>;
 				scl-gpios = <&pioA PIN_PC28 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
 				status = "okay";
 			};
@@ -246,7 +246,7 @@
 
 				pinctrl_spi1_default: spi1_default {
 					pinmux = <PIN_PD25__SPI1_SPCK>,
-						 <PIN_PA26__SPI1_MOSI>,
+						 <PIN_PD26__SPI1_MOSI>,
 						 <PIN_PD27__SPI1_MISO>,
 						 <PIN_PD28__SPI1_NPCS0>;
 					bias-disable;
